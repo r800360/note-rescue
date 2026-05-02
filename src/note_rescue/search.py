@@ -1,4 +1,5 @@
-from pathlib import Path
+from __future__ import annotations
+
 from typing import List, Dict
 
 from .paths import VAULT_DIR
@@ -7,6 +8,10 @@ from .paths import VAULT_DIR
 def search_notes(query: str, limit: int = 20) -> List[Dict]:
     """
     Simple full-text search over the Markdown vault.
+
+    Ranking:
+    - Notes containing all query terms rank above partial matches.
+    - Then notes with higher term frequency rank higher.
     """
     query_terms = [term.lower() for term in query.split() if term.strip()]
     results = []
@@ -21,19 +26,40 @@ def search_notes(query: str, limit: int = 20) -> List[Dict]:
             continue
 
         lowered = text.lower()
-        score = sum(lowered.count(term) for term in query_terms)
+        term_counts = {term: lowered.count(term) for term in query_terms}
+        matched_terms = [term for term, count in term_counts.items() if count > 0]
 
-        if score > 0:
-            snippet = make_snippet(text, query_terms)
-            results.append(
-                {
-                    "path": str(path),
-                    "score": score,
-                    "snippet": snippet,
-                }
-            )
+        if not matched_terms:
+            continue
 
-    results.sort(key=lambda x: x["score"], reverse=True)
+        all_terms_match = len(matched_terms) == len(query_terms)
+        raw_score = sum(term_counts.values())
+
+        score = raw_score
+        if all_terms_match:
+            score += 1000
+
+        snippet = make_snippet(text, query_terms)
+
+        results.append({
+            "path": str(path),
+            "score": score,
+            "raw_score": raw_score,
+            "matched_terms": len(matched_terms),
+            "total_terms": len(query_terms),
+            "all_terms_match": all_terms_match,
+            "snippet": snippet,
+        })
+
+    results.sort(
+        key=lambda x: (
+            x["all_terms_match"],
+            x["matched_terms"],
+            x["raw_score"],
+        ),
+        reverse=True,
+    )
+
     return results[:limit]
 
 

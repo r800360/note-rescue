@@ -12,7 +12,7 @@ from .paths import (
 )
 from .classifier import classify_text, make_safe_filename
 from .todo_extractor import extract_todos
-from .state import has_imported_hash, mark_hash_imported
+from .state import has_imported_hash, mark_hash_imported, rebuild_state_from_vault
 
 
 def hash_text(text: str) -> str:
@@ -47,6 +47,8 @@ def import_notes() -> dict:
     Converts Notepad++ backup files into Markdown notes in vault/.
     Non-destructive: does not delete or modify Notepad++ files.
     """
+    rebuild_state_from_vault()
+
     files = find_notepadpp_backup_files()
 
     seen_hashes = set()

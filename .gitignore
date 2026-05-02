@@ -1,7 +1,16 @@
-.venv/
-__pycache__/
-*.pyc
+# Local app state
+data/state.json
+
+# Local generated data
 data/raw_backups/
 data/indexes/
 data/reports/
+data/logs/
+
+# Private notes
 vault/
+
+# Python
+.venv/
+__pycache__/
+*.pyc

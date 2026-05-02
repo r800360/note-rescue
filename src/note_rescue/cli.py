@@ -11,6 +11,9 @@ from .search import search_notes
 from .paths import VAULT_DIR
 from .todo_extractor import extract_todos
 from .status import get_notepadpp_status, get_risk_level
+from .state import rebuild_state_from_vault
+from .cleanup import generate_cleanup_report
+from .smoke_test import run_smoke_test
 from .readme_updater import update_readme
 
 console = Console()
@@ -134,39 +137,53 @@ def cmd_status(args):
 
     console.print(table)
 
+def cmd_rebuild_state(args):
+    result = rebuild_state_from_vault()
+
+    console.print(Panel.fit(
+        "\n".join([
+            f"State path: {result['state_path']}",
+            f"Scanned vault notes: {result['scanned_notes']}",
+            f"Notes with sha256 metadata: {result['notes_with_hash']}",
+            f"Known imported hashes: {result['known_imported_hashes']}",
+            f"New hashes rebuilt from vault: {result['rebuilt_count']}",
+        ]),
+        title="State Rebuilt"
+    ))
+
 
 def cmd_sync(args):
     """
-    Future-proof command:
-    backup + import + todos.
-    With persistent deduplication, this can be run repeatedly.
+    Safe recurring command:
+    backup + import new notes only + todos + cleanup report.
     """
-    console.print("[bold cyan]Step 1/3: Backing up Notepad++...[/bold cyan]")
-    backup_path = backup_notepadpp()
+    console.print("[bold cyan]Step 0/4: Rebuilding state from existing vault...[/bold cyan]")
+    rebuild = rebuild_state_from_vault()
+    console.print(f"[green]Known imported hashes:[/green] {rebuild['known_imported_hashes']}")
 
+    console.print("[bold cyan]Step 1/4: Backing up Notepad++...[/bold cyan]")
+    backup_path = backup_notepadpp()
     console.print(f"[green]Backup saved to:[/green] {backup_path}")
 
-    console.print("[bold cyan]Step 2/3: Importing new notes...[/bold cyan]")
+    console.print("[bold cyan]Step 2/4: Importing new notes only...[/bold cyan]")
     index = import_notes()
 
-    console.print(
-        Panel.fit(
-            "\n".join(
-                [
-                    f"Files seen: {index['total_files_seen']}",
-                    f"Newly imported: {index['imported_count']}",
-                    f"Skipped empty: {index['skipped_empty']}",
-                    f"Skipped duplicates/already imported: {index['skipped_duplicates']}",
-                ]
-            ),
-            title="Sync Import Complete",
-        )
-    )
+    console.print(Panel.fit(
+        "\n".join([
+            f"Files seen: {index['total_files_seen']}",
+            f"Newly imported: {index['imported_count']}",
+            f"Skipped empty: {index['skipped_empty']}",
+            f"Skipped duplicates/already imported: {index['skipped_duplicates']}",
+        ]),
+        title="Sync Import Complete"
+    ))
 
-    console.print("[bold cyan]Step 3/3: Extracting TODOs...[/bold cyan]")
+    console.print("[bold cyan]Step 3/4: Extracting TODOs...[/bold cyan]")
     cmd_todos(args)
 
-    console.print("[bold green]Sync complete.[/bold green]")
+    console.print("[bold cyan]Step 4/4: Generating cleanup report...[/bold cyan]")
+    report_path = generate_cleanup_report()
+    console.print(f"[green]Cleanup report:[/green] {report_path}")
 
     try:
         readme_path = update_readme()
@@ -174,21 +191,21 @@ def cmd_sync(args):
     except Exception as exc:
         console.print(f"[yellow]README update skipped:[/yellow] {exc}")
 
+    console.print("[bold green]Sync complete.[/bold green]")
+
 
 def cmd_doctor(args):
     status = get_notepadpp_status()
     risk, message = get_risk_level(status["active_backup_files"])
 
-    console.print(
-        Panel.fit(
-            f"Risk level: [bold]{risk}[/bold]\n{message}",
-            title="Notepad++ Health Check",
-        )
-    )
+    console.print(Panel.fit(
+        f"Risk level: [bold]{risk}[/bold]\n{message}",
+        title="Notepad++ Health Check"
+    ))
 
     if risk in {"LOW", "MODERATE"}:
         console.print("[green]No urgent action needed.[/green]")
-        console.print("Recommended habit: run `python main.py sync` weekly.")
+        console.print("Recommended habit: let the scheduled daily sync run, or run `python main.py sync` manually.")
         return
 
     if risk == "HIGH":
@@ -198,27 +215,51 @@ def cmd_doctor(args):
         console.print("3. Manually close unnecessary Notepad++ tabs")
         return
 
-    if risk in {"VERY HIGH", "EMERGENCY"}:
-        console.print("[red]Recommended action:[/red]")
-        console.print("1. Run `python main.py sync`")
-        console.print("2. Confirm important notes exist in `vault/`")
-        console.print("3. Close Notepad++")
-        console.print("4. Rename the active Notepad++ session and backup folder")
-        console.print("")
-        console.print("Safe reset commands:")
-        console.print(r"taskkill /F /IM notepad++.exe")
-        console.print(r'cd "$env:APPDATA\Notepad++"')
-        console.print(r"Rename-Item session.xml session_rescued_auto.xml")
-        console.print(r"Rename-Item backup backup_rescued_auto")
-        console.print(r"mkdir backup")
+    console.print("[red]Recommended action:[/red]")
+    console.print("1. Run `python main.py sync`")
+    console.print("2. Confirm important notes exist in `vault/`")
+    console.print("3. Close Notepad++")
+    console.print("4. Rename the active Notepad++ session and backup folder")
+    console.print("")
+    console.print("Safe reset commands:")
+    console.print(r'taskkill /F /IM notepad++.exe')
+    console.print(r'cd "$env:APPDATA\Notepad++"')
+    console.print(r'Rename-Item session.xml session_rescued_auto.xml')
+    console.print(r'Rename-Item backup backup_rescued_auto')
+    console.print(r'mkdir backup')
+
+
+def cmd_cleanup_report(args):
+    report_path = generate_cleanup_report()
+
+    console.print(Panel.fit(
+        f"Generated cleanup report:\n[bold green]{report_path}[/bold green]",
+        title="Cleanup Report Complete"
+    ))
+
+
+def cmd_smoke_test(args):
+    results = run_smoke_test()
+
+    table = Table(title="note-rescue Smoke Test")
+    table.add_column("Check")
+    table.add_column("Result")
+
+    for key, value in results.items():
+        table.add_row(key, str(value))
+
+    console.print(table)
+
+    if results.get("passed"):
+        console.print("[bold green]Smoke test passed.[/bold green]")
+    else:
+        console.print("[bold red]Smoke test failed. Review the table above.[/bold red]")
 
 
 def cmd_update_readme(args):
     readme_path = update_readme()
 
-    console.print(
-        Panel.fit(
-            f"Updated README auto-generated section:\n[bold green]{readme_path}[/bold green]",
-            title="README Updated",
-        )
-    )
+    console.print(Panel.fit(
+        f"Updated README auto-generated section:\n[bold green]{readme_path}[/bold green]",
+        title="README Updated"
+    ))

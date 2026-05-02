@@ -1,13 +1,8 @@
-from pathlib import Path
-from datetime import datetime
-import os
+from __future__ import annotations
 
-from .paths import (
-    get_notepadpp_backup_dir,
-    get_notepadpp_session_file,
-    VAULT_DIR,
-    DATA_DIR,
-)
+from datetime import datetime
+
+from .paths import get_notepadpp_backup_dir, get_notepadpp_session_file, VAULT_DIR
 from .state import load_state
 
 
@@ -24,7 +19,12 @@ def get_notepadpp_status() -> dict:
         for path in backup_dir.rglob("*"):
             if path.is_file():
                 backup_files.append(path)
-                size = path.stat().st_size
+
+                try:
+                    size = path.stat().st_size
+                except OSError:
+                    size = 0
+
                 total_size += size
 
                 if size == 0:
@@ -53,13 +53,10 @@ def get_notepadpp_status() -> dict:
 
 def get_risk_level(active_backup_files: int) -> tuple[str, str]:
     if active_backup_files < 50:
-        return "LOW", "Healthy. Notepad++ session size is currently manageable."
+        return "LOW", "Healthy. Notepad++ session size is manageable."
 
     if active_backup_files < 150:
-        return (
-            "MODERATE",
-            "You are accumulating unsaved tabs. Consider running sync soon.",
-        )
+        return "MODERATE", "You are accumulating unsaved tabs. Run sync soon."
 
     if active_backup_files < 300:
         return "HIGH", "Notepad++ may start slowing down. Run sync and clean tabs."
@@ -67,7 +64,4 @@ def get_risk_level(active_backup_files: int) -> tuple[str, str]:
     if active_backup_files < 1000:
         return "VERY HIGH", "You are approaching another serious Notepad++ buildup."
 
-    return (
-        "EMERGENCY",
-        "Notepad++ is likely to become slow or fail to start. Back up, sync, and reset soon.",
-    )
+    return "EMERGENCY", "Notepad++ is likely to become slow or fail to start. Back up, sync, and reset soon."
