@@ -25,11 +25,13 @@ def search_notes(query: str, limit: int = 20) -> List[Dict]:
 
         if score > 0:
             snippet = make_snippet(text, query_terms)
-            results.append({
-                "path": str(path),
-                "score": score,
-                "snippet": snippet,
-            })
+            results.append(
+                {
+                    "path": str(path),
+                    "score": score,
+                    "snippet": snippet,
+                }
+            )
 
     results.sort(key=lambda x: x["score"], reverse=True)
     return results[:limit]

@@ -1,7 +1,6 @@
 import re
 from typing import List
 
-
 TODO_PATTERNS = [
     r"^\s*-\s*\[\s*\]\s+(.+)$",
     r"^\s*TODO[:\-\s]+(.+)$",
@@ -10,7 +9,7 @@ TODO_PATTERNS = [
     r"^\s*Action item[:\-\s]+(.+)$",
     r"^\s*ACTION ITEM[:\-\s]+(.+)$",
     r"^\s*Need to[:\-\s]+(.+)$",
-    r"^\s*Remember to[:\-\s]+(.+)$"
+    r"^\s*Remember to[:\-\s]+(.+)$",
 ]
 
 

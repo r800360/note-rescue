@@ -12,6 +12,7 @@ from .paths import (
 )
 from .classifier import classify_text, make_safe_filename
 from .todo_extractor import extract_todos
+from .state import has_imported_hash, mark_hash_imported
 
 
 def hash_text(text: str) -> str:
@@ -68,6 +69,10 @@ def import_notes() -> dict:
             skipped_duplicates += 1
             continue
 
+        if has_imported_hash(digest):
+            skipped_duplicates += 1
+            continue
+
         seen_hashes.add(digest)
 
         category, scores = classify_text(text)
@@ -95,13 +100,21 @@ def import_notes() -> dict:
 
         md_path.write_text(md_content, encoding="utf-8")
 
-        imported.append({
-            "original_file": str(path),
-            "markdown_file": str(md_path),
-            "category": category,
-            "sha256": digest,
-            "todo_count": len(todos),
-        })
+        mark_hash_imported(
+            digest=digest,
+            markdown_file=str(md_path),
+            original_file=str(path),
+        )
+
+        imported.append(
+            {
+                "original_file": str(path),
+                "markdown_file": str(md_path),
+                "category": category,
+                "sha256": digest,
+                "todo_count": len(todos),
+            }
+        )
 
     index = {
         "imported_at": datetime.now().isoformat(timespec="seconds"),
@@ -113,7 +126,10 @@ def import_notes() -> dict:
     }
 
     INDEXES_DIR.mkdir(parents=True, exist_ok=True)
-    index_path = INDEXES_DIR / f"import_index_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+    index_path = (
+        INDEXES_DIR
+        / f"import_index_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.json"
+    )
     index_path.write_text(json.dumps(index, indent=2), encoding="utf-8")
 
     return index
