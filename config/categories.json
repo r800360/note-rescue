@@ -1,0 +1,90 @@
+{
+  "ChatGPT": [
+    "chatgpt",
+    "gpt",
+    "prompt",
+    "assistant",
+    "claude",
+    "gemini"
+  ],
+  "School": [
+    "cse",
+    "math",
+    "homework",
+    "quiz",
+    "midterm",
+    "final",
+    "professor",
+    "lecture",
+    "assignment",
+    "ucsd"
+  ],
+  "Projects": [
+    "project",
+    "repo",
+    "github",
+    "implementation",
+    "architecture",
+    "frontend",
+    "backend",
+    "next.js",
+    "react",
+    "typescript",
+    "python",
+    "pipeline"
+  ],
+  "TESC": [
+    "tesc",
+    "engineering student council",
+    "student travel funds",
+    "reimbursement",
+    "dean",
+    "event",
+    "vp internal"
+  ],
+  "AISC": [
+    "aisc",
+    "artificial intelligence student collective",
+    "ai student collective",
+    "outreach",
+    "steam day"
+  ],
+  "Research": [
+    "research",
+    "paper",
+    "experiment",
+    "auc",
+    "vae",
+    "autoencoder",
+    "umap",
+    "carla",
+    "ad optimization",
+    "loma",
+    "differentiable"
+  ],
+  "Tech_Debugging": [
+    "notepad++",
+    "windows",
+    "freeze",
+    "crash",
+    "driver",
+    "bios",
+    "sleep",
+    "hibernate",
+    "chrome",
+    "wsl",
+    "memory",
+    "gpu",
+    "dell"
+  ],
+  "Personal": [
+    "personal",
+    "calendar",
+    "life",
+    "health",
+    "family",
+    "travel",
+    "costco",
+    "email"
+  ]
+}
