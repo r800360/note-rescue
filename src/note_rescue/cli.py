@@ -11,6 +11,7 @@ from .search import search_notes
 from .paths import VAULT_DIR
 from .todo_extractor import extract_todos
 from .status import get_notepadpp_status, get_risk_level
+from .readme_updater import update_readme
 
 console = Console()
 
@@ -167,6 +168,12 @@ def cmd_sync(args):
 
     console.print("[bold green]Sync complete.[/bold green]")
 
+    try:
+        readme_path = update_readme()
+        console.print(f"[green]README updated:[/green] {readme_path}")
+    except Exception as exc:
+        console.print(f"[yellow]README update skipped:[/yellow] {exc}")
+
 
 def cmd_doctor(args):
     status = get_notepadpp_status()
@@ -204,3 +211,14 @@ def cmd_doctor(args):
         console.print(r"Rename-Item session.xml session_rescued_auto.xml")
         console.print(r"Rename-Item backup backup_rescued_auto")
         console.print(r"mkdir backup")
+
+
+def cmd_update_readme(args):
+    readme_path = update_readme()
+
+    console.print(
+        Panel.fit(
+            f"Updated README auto-generated section:\n[bold green]{readme_path}[/bold green]",
+            title="README Updated",
+        )
+    )

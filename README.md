@@ -346,6 +346,80 @@ may return notes that contain `Dell`, notes that contain `freezing`, or notes th
 
 ---
 
+## Auto-generated project reference
+
+<!-- AUTO-GENERATED:START -->
+
+> This section is automatically generated. Do not edit this section by hand.
+
+Last updated: `2026-05-02T14:44:40`
+
+### Available CLI commands
+
+| Command | Purpose |
+|---|---|
+| `python main.py backup` | Back up Notepad++ session and unsaved backup files. |
+| `python main.py import` | Import Notepad++ backup files into the Markdown vault. |
+| `python main.py todos` | Extract TODOs from the vault into `vault/TODO/global_todos.md`. |
+| `python main.py search "query"` | Search imported Markdown notes. |
+| `python main.py status` | Show Notepad++ and vault health status. |
+| `python main.py sync` | Back up, import new notes, and extract TODOs. |
+| `python main.py doctor` | Diagnose whether Notepad++ is accumulating too many unsaved tabs. |
+| `python main.py update-readme` | Refresh this auto-generated README section. |
+
+### Current Notepad++ health snapshot
+
+| Metric | Value |
+|---|---:|
+| Risk level | `LOW` |
+| Active Notepad++ backup files | `0` |
+| Nonempty backup files | `0` |
+| Empty backup files | `0` |
+| Backup folder size | `0.0 MB` |
+| Vault Markdown notes | `1971` |
+| Known imported hashes | `0` |
+
+Health note: **Healthy. Notepad++ session size is currently manageable.**
+
+### Vault note counts by category
+
+| Category | Notes |
+|---|---:|
+| `AISC` | `29` |
+| `Archive` | `0` |
+| `ChatGPT` | `15` |
+| `Inbox` | `694` |
+| `Personal` | `132` |
+| `Projects` | `338` |
+| `Research` | `99` |
+| `School` | `450` |
+| `TESC` | `181` |
+| `TODO` | `1` |
+| `Tech_Debugging` | `32` |
+
+### Configured classification categories
+
+| Category | Keyword count |
+|---|---:|
+| `AISC` | `5` |
+| `ChatGPT` | `6` |
+| `Personal` | `8` |
+| `Projects` | `12` |
+| `Research` | `11` |
+| `School` | `10` |
+| `TESC` | `7` |
+| `Tech_Debugging` | `13` |
+
+### Persistent import state
+
+| Metric | Value |
+|---|---:|
+| State file exists | `False` |
+| Known imported hashes | `0` |
+| State last updated | `N/A` |
+
+<!-- AUTO-GENERATED:END -->
+
 ## Recommended emergency rescue workflow
 
 Use this when Notepad++ is overloaded and will not start properly.

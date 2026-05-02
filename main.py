@@ -15,6 +15,7 @@ from note_rescue.cli import (
     cmd_status,
     cmd_sync,
     cmd_doctor,
+    cmd_update_readme,
 )
 
 
@@ -61,6 +62,10 @@ def build_parser():
         help="Diagnose whether Notepad++ is accumulating too many unsaved tabs.",
     )
     doctor_parser.set_defaults(func=cmd_doctor)
+    update_readme_parser = subparsers.add_parser(
+        "update-readme", help="Update the auto-generated README section."
+    )
+    update_readme_parser.set_defaults(func=cmd_update_readme)
 
     return parser
 
