@@ -41,7 +41,7 @@ Pin these to your taskbar or desktop if you like:
 | `doctor.cmd` | Quick health check |
 | `inbox.cmd` | Open `vault/Inbox/` |
 | `privacy-check.cmd` | Before pushing this repo to public GitHub |
-| `scholar.cmd` | PATHS scholar meeting prep (optional; needs local config) |
+| `scholar.cmd` | scholar meeting prep (optional; needs local config) |
 
 ### Command-line shortcuts
 
@@ -71,7 +71,7 @@ python main.py inbox                       # open Inbox
 - **Safe session reset** (`reset` / `reset-npp.cmd`)
 - **Windows toasts** after sync
 - Scheduled daily sync, smoke test, privacy check, cleanup reports
-- Optional **PATHS scholar** profiles and handoff summaries (`config/scholars.json`)
+- Optional **scholar** profiles and handoff summaries (`config/scholars.json`)
 
 Out of scope for this repo: semantic/vector search, web UI, automatic note merging or LLM summarization.
 
@@ -259,7 +259,7 @@ Last updated: `2026-05-31T11:51:01`
 | `python main.py rebuild-state` | Rebuild import dedup state from vault frontmatter. |
 | `python main.py smoke-test` | Basic project health checks. |
 | `python main.py privacy-check` | Scan tracked files before a public git push. |
-| `python main.py scholar list` | List PATHS scholars (local config). |
+| `python main.py scholar list` | List scholars (local config). |
 
 ### Double-click launchers (Windows)
 

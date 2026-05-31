@@ -189,7 +189,7 @@ def build_parser():
 
     scholar_parser = subparsers.add_parser(
         "scholar",
-        help="PATHS scholar profiles, meeting prep, and handoff summaries.",
+        help="scholar profiles, meeting prep, and handoff summaries.",
     )
     scholar_sub = scholar_parser.add_subparsers(dest="scholar_action", required=True)
 
