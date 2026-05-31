@@ -69,11 +69,27 @@ def build_parser():
     find_parser.add_argument("--limit", type=int, default=10)
     find_parser.add_argument("--no-open", action="store_true", help="Don't open the top result.")
     find_parser.add_argument(
+        "--pick",
+        action="store_true",
+        help="Show top matches and let you pick which to open.",
+    )
+    find_parser.add_argument(
         "--with-app",
         choices=["default", "notepad++", "vscode"],
         default="notepad++",
     )
     find_parser.set_defaults(func=cmd_find)
+
+    inbox_parser = subparsers.add_parser(
+        "inbox",
+        help="Open vault/Inbox/ in your editor (lazy shortcut).",
+    )
+    inbox_parser.add_argument(
+        "--with-app",
+        choices=["default", "notepad++", "vscode", "explorer"],
+        default="default",
+    )
+    inbox_parser.set_defaults(func=cmd_open, target="inbox")
 
     todos_parser = subparsers.add_parser(
         "todos", help="Extract TODOs from imported notes."

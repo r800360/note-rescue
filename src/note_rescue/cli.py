@@ -543,11 +543,11 @@ def cmd_go(args):
     lines.extend([
         "",
         "[bold]Quick commands:[/bold]",
-        '  python main.py find "meeting notes"     # search + open top result',
-        "  python main.py open todos               # open your TODO list",
-        "  todos.cmd                               # refresh + open TODOs (lazy)",
-        "  python main.py recent                   # see what was rescued lately",
+        '  find-notes.cmd  or  python main.py find "meeting notes"',
+        "  todos.cmd                               # refresh + open TODOs",
+        "  sync-now.cmd                            # rescue now (not only 9 PM)",
         "  python main.py reset --apply            # fresh Notepad++ session",
+        "  python main.py inbox                    # open Inbox folder",
     ])
 
     console.print(Panel("\n".join(lines), title="note-rescue", border_style="cyan"))

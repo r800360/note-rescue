@@ -116,6 +116,41 @@ def generate_auto_section() -> str:
     lines.append(
         "| `python main.py today` | Notes imported today. |"
     )
+    lines.append(
+        "| `python main.py inbox` | Open `vault/Inbox/` in your editor. |"
+    )
+    lines.append(
+        "| `python main.py todos-apply` | Dismiss checked `- [x]` items from global TODOs. |"
+    )
+    lines.append(
+        "| `python main.py cleanup-report` | Generate a non-destructive cleanup report. |"
+    )
+    lines.append(
+        "| `python main.py rebuild-state` | Rebuild import dedup state from vault frontmatter. |"
+    )
+    lines.append(
+        "| `python main.py smoke-test` | Basic project health checks. |"
+    )
+    lines.append(
+        "| `python main.py privacy-check` | Scan tracked files before a public git push. |"
+    )
+    lines.append(
+        "| `python main.py scholar list` | List PATHS scholars (local config). |"
+    )
+    lines.append("")
+    lines.append("### Double-click launchers (Windows)")
+    lines.append("")
+    lines.append("| File | What it does |")
+    lines.append("|---|---|")
+    lines.append("| `go.cmd` | Dashboard |")
+    lines.append("| `sync-now.cmd` | Run sync now |")
+    lines.append("| `find-notes.cmd` | Interactive search |")
+    lines.append("| `todos.cmd` | Refresh + open TODOs (`todos.cmd apply` to clear checked items) |")
+    lines.append("| `reset-npp.cmd` | Sync then reset Notepad++ session |")
+    lines.append("| `doctor.cmd` | Health check |")
+    lines.append("| `inbox.cmd` | Open Inbox |")
+    lines.append("| `privacy-check.cmd` | Pre-push privacy scan |")
+    lines.append("| `scholar.cmd` | Scholar meeting prep |")
     lines.append("")
 
     lines.append("### Current Notepad++ health snapshot")

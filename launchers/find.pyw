@@ -12,6 +12,7 @@ from console_utils import attach_console, pause
 
 attach_console("note-rescue Find Notes")
 os.chdir(ROOT)
+os.environ["NOTE_RESCUE_LAUNCHER"] = "1"
 
 from note_rescue.cli import cmd_find
 
