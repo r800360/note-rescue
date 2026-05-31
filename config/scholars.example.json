@@ -1,0 +1,20 @@
+{
+  "academic_year": "2025-26",
+  "mentor_name": "YOUR_NAME",
+  "academic_csv": "data/scholars/academic.csv",
+  "professional_csv": "data/scholars/professional.csv",
+  "scholars": [
+    {
+      "id": "scholar-1",
+      "display_name": "Scholar One",
+      "full_name": "Scholar One",
+      "aliases": ["Scholar One", "scholar1"]
+    },
+    {
+      "id": "scholar-2",
+      "display_name": "Scholar Two",
+      "full_name": "Scholar Two",
+      "aliases": ["Scholar Two", "scholar2"]
+    }
+  ]
+}

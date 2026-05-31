@@ -1,5 +1,6 @@
 # Local app state
 data/state.json
+data/dismissed_todos.json
 
 # Local generated data
 data/raw_backups/
@@ -9,6 +10,14 @@ data/logs/
 
 # Private notes
 vault/
+
+# Private scholar / mentor data (NEVER commit to a public repo)
+config/scholars.json
+config/scholars.local.json
+data/scholars/
+
+# Local settings overrides (optional)
+config/settings.local.json
 
 # Python
 .venv/

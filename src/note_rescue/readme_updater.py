@@ -98,6 +98,24 @@ def generate_auto_section() -> str:
     lines.append(
         "| `python main.py update-readme` | Refresh this auto-generated README section. |"
     )
+    lines.append(
+        "| `python main.py go` | Lazy dashboard — status, todos, quick commands. |"
+    )
+    lines.append(
+        '| `python main.py find "query"` | Search and open top result in Notepad++. |'
+    )
+    lines.append(
+        "| `python main.py reset [--apply]` | Preview or perform safe Notepad++ session reset. |"
+    )
+    lines.append(
+        "| `python main.py open todos` | Open global TODO list. |"
+    )
+    lines.append(
+        "| `python main.py recent` | Notes imported in the last 7 days. |"
+    )
+    lines.append(
+        "| `python main.py today` | Notes imported today. |"
+    )
     lines.append("")
 
     lines.append("### Current Notepad++ health snapshot")

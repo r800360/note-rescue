@@ -12,25 +12,83 @@ The project is intentionally non-destructive by default.
 
 ---
 
+## Lazy user quick start
+
+If you barely use this tool and just want Notepad++ to stop eating your life:
+
+### One-time setup
+
+```powershell
+cd C:\Users\YOU\Documents\note-rescue
+.\setup.ps1
+```
+
+This creates the venv, installs deps, and registers the **9 PM daily sync** task.
+
+### Daily life (do almost nothing)
+
+1. **Take quick notes in Notepad++** like you always do — unsaved tabs are fine.
+2. **At 9 PM**, Windows automatically runs sync. You get a toast: how many notes were rescued, tab count, risk level.
+3. When tabs pile up again, double-click **`reset-npp.ps1`** — it syncs first, then gives Notepad++ a fresh session. Nothing is deleted; old session is renamed.
+
+### When you need to find something
+
+```powershell
+.\find.ps1 "student travel funds"
+```
+
+Or:
+
+```powershell
+python main.py find "CSE 252D meeting"
+```
+
+This searches your vault and opens the best match in Notepad++.
+
+### When you want a quick status check
+
+```powershell
+.\go.ps1
+```
+
+Shows risk level, TODO count, today's rescued notes, and what to do next.
+
+### Other one-liners
+
+| You want | Command |
+|---|---|
+| Open your TODO list | `python main.py open todos` |
+| See today's rescued notes | `python main.py today` |
+| See this week's notes | `python main.py recent` |
+| Preview session reset | `python main.py reset` |
+| Actually reset Notepad++ | `python main.py reset --apply --kill-notepadpp` |
+| Full health check | `python main.py doctor` |
+
+Auto-reset: when you have **100+ tabs** and sync has already imported everything, sync can automatically reset Notepad++ (configurable in `config/settings.json`).
+
+---
+
 ## Current status
 
 The current version supports:
 
 - Backing up Notepad++ unsaved-tab data
 - Importing Notepad++ backup files into Markdown notes
-- Deduplicating notes within one import run
+- **Persistent deduplication** across runs (via `data/state.json`)
 - Skipping empty notes
 - Categorizing notes using keyword-based rules
 - Extracting TODOs into a global TODO file
-- Searching imported notes from the command line
+- Searching imported notes from the command line (all-term ranking)
+- **Safe Notepad++ session reset** (`reset` command)
+- **Windows toast notifications** after sync
+- **Lazy dashboard** (`go`), **find-and-open** (`find`), **recent/today** views
+- **Auto-reset** when tab count exceeds threshold (after sync imports everything)
+- Daily scheduled sync at 9 PM
 
 It does **not yet** support:
 
-- Persistent deduplication across multiple import runs
 - Semantic/vector search
 - Web UI dashboard
-- Automatic Notepad++ cleanup
-- Automatic deletion of old Notepad++ backup files
 - Full note merging/summarization
 
 ---
@@ -145,7 +203,7 @@ note-rescue/
 From PowerShell:
 
 ```powershell
-cd C:\Users\bsach\Documents\note-rescue
+cd C:\Users\YOU\Documents\note-rescue
 ```
 
 Create the virtual environment:
@@ -203,7 +261,7 @@ rich==13.9.4
 Run commands from the project root:
 
 ```powershell
-cd C:\Users\bsach\Documents\note-rescue
+cd C:\Users\YOU\Documents\note-rescue
 .\.venv\Scripts\Activate.ps1
 ```
 
@@ -224,7 +282,7 @@ Example output:
 ```text
 Backup Complete
 Backed up Notepad++ files to:
-C:\Users\bsach\Documents\note-rescue\data\raw_backups\notepadpp_backup_2026-05-02_11-44-59
+C:\Users\YOU\Documents\note-rescue\data\raw_backups\notepadpp_backup_2026-05-02_11-44-59
 ```
 
 This command is non-destructive.
@@ -270,11 +328,7 @@ TESC            181
 Tech_Debugging   32
 ```
 
-Important:
-
-The current importer deduplicates notes within one import run only. It does not yet check whether the same notes were imported in a previous run.
-
-So avoid running `import` repeatedly until persistent deduplication is added.
+Safe to run repeatedly: the importer skips notes already in `data/state.json` (rebuilt from vault frontmatter on each sync).
 
 ---
 
@@ -295,7 +349,7 @@ Example output:
 ```text
 TODO Extraction Complete
 Extracted 42 TODOs into:
-C:\Users\bsach\Documents\note-rescue\vault\TODO\global_todos.md
+C:\Users\YOU\Documents\note-rescue\vault\TODO\global_todos.md
 ```
 
 TODO patterns currently recognized include lines like:
@@ -334,15 +388,13 @@ You can limit results:
 python main.py search "Dell freezing" --limit 5
 ```
 
-Current search is simple keyword counting. It is useful but not perfect.
+Search ranks notes containing **all** query terms highest, then partial matches by frequency.
 
-For example, searching:
+Use `find` to search and open the top result in Notepad++:
 
-```text
-Dell freezing
+```powershell
+python main.py find "Dell freezing"
 ```
-
-may return notes that contain `Dell`, notes that contain `freezing`, or notes that contain both. Future versions should rank notes containing all query terms higher.
 
 ---
 
@@ -352,7 +404,7 @@ may return notes that contain `Dell`, notes that contain `freezing`, or notes th
 
 > This section is automatically generated. Do not edit this section by hand.
 
-Last updated: `2026-05-02T15:38:35`
+Last updated: `2026-05-31T11:08:03`
 
 ### Available CLI commands
 
@@ -366,20 +418,26 @@ Last updated: `2026-05-02T15:38:35`
 | `python main.py sync` | Back up, import new notes, and extract TODOs. |
 | `python main.py doctor` | Diagnose whether Notepad++ is accumulating too many unsaved tabs. |
 | `python main.py update-readme` | Refresh this auto-generated README section. |
+| `python main.py go` | Lazy dashboard — status, todos, quick commands. |
+| `python main.py find "query"` | Search and open top result in Notepad++. |
+| `python main.py reset [--apply]` | Preview or perform safe Notepad++ session reset. |
+| `python main.py open todos` | Open global TODO list. |
+| `python main.py recent` | Notes imported in the last 7 days. |
+| `python main.py today` | Notes imported today. |
 
 ### Current Notepad++ health snapshot
 
 | Metric | Value |
 |---|---:|
-| Risk level | `LOW` |
-| Active Notepad++ backup files | `2` |
-| Nonempty backup files | `1` |
-| Empty backup files | `1` |
-| Backup folder size | `0.0 MB` |
-| Vault Markdown notes | `1973` |
-| Known imported hashes | `1972` |
+| Risk level | `MODERATE` |
+| Active Notepad++ backup files | `123` |
+| Nonempty backup files | `101` |
+| Empty backup files | `22` |
+| Backup folder size | `0.25 MB` |
+| Vault Markdown notes | `2091` |
+| Known imported hashes | `2090` |
 
-Health note: **Healthy. Notepad++ session size is manageable.**
+Health note: **You are accumulating unsaved tabs. Run sync soon.**
 
 ### Vault note counts by category
 
@@ -387,15 +445,15 @@ Health note: **Healthy. Notepad++ session size is manageable.**
 |---|---:|
 | `AISC` | `29` |
 | `Archive` | `0` |
-| `ChatGPT` | `15` |
-| `Inbox` | `694` |
-| `Personal` | `132` |
-| `Projects` | `339` |
-| `Research` | `99` |
-| `School` | `451` |
-| `TESC` | `181` |
+| `ChatGPT` | `16` |
+| `Inbox` | `722` |
+| `Personal` | `136` |
+| `Projects` | `364` |
+| `Research` | `126` |
+| `School` | `475` |
+| `TESC` | `189` |
 | `TODO` | `1` |
-| `Tech_Debugging` | `32` |
+| `Tech_Debugging` | `33` |
 
 ### Configured classification categories
 
@@ -415,8 +473,8 @@ Health note: **Healthy. Notepad++ session size is manageable.**
 | Metric | Value |
 |---|---:|
 | State file exists | `True` |
-| Known imported hashes | `1972` |
-| State last updated | `2026-05-02T15:38:34` |
+| Known imported hashes | `2090` |
+| State last updated | `2026-05-31T11:08:02` |
 
 <!-- AUTO-GENERATED:END -->
 
@@ -447,13 +505,13 @@ python main.py todos
 Open the vault in VSCode:
 
 ```powershell
-code C:\Users\bsach\Documents\note-rescue\vault
+code C:\Users\YOU\Documents\note-rescue\vault
 ```
 
 Or open it in File Explorer:
 
 ```powershell
-explorer C:\Users\bsach\Documents\note-rescue\vault
+explorer C:\Users\YOU\Documents\note-rescue\vault
 ```
 
 Check these folders first:
@@ -507,27 +565,24 @@ It should no longer attempt to load the old thousands-tab session.
 
 ---
 
-## One-shot Notepad++ reset command
+## Easy Notepad++ session reset
 
-Use only after confirming your notes were backed up and imported.
+**Easiest (recommended):**
 
 ```powershell
-taskkill /F /IM notepad++.exe
-
-cd "$env:APPDATA\Notepad++"
-
-if (Test-Path session.xml) {
-    Rename-Item session.xml session_rescued_2026-05-02.xml
-}
-
-if (Test-Path backup) {
-    Rename-Item backup backup_rescued_2026-05-02
-}
-
-mkdir backup
+.\reset-npp.ps1
 ```
 
-This does not delete the old session. It renames it so Notepad++ starts cleanly.
+Syncs first, then resets. Or from Python:
+
+```powershell
+python main.py reset              # preview (dry-run)
+python main.py reset --apply --kill-notepadpp
+```
+
+This renames (not deletes) `session.xml` and the `backup/` folder with a timestamp, then creates a fresh empty `backup/`.
+
+Configure auto-reset threshold in `config/settings.json` (`auto_reset_threshold`, default 100 tabs).
 
 ---
 
@@ -542,7 +597,7 @@ Usually:
 Expanded example:
 
 ```text
-C:\Users\bsach\AppData\Roaming\Notepad++\backup
+C:\Users\YOU\AppData\Roaming\Notepad++\backup
 ```
 
 The session file is usually:
@@ -554,7 +609,7 @@ The session file is usually:
 Expanded example:
 
 ```text
-C:\Users\bsach\AppData\Roaming\Notepad++\session.xml
+C:\Users\YOU\AppData\Roaming\Notepad++\session.xml
 ```
 
 `note-rescue` reads from these locations.
@@ -582,7 +637,7 @@ Each generated note includes YAML-style frontmatter:
 ```yaml
 ---
 source: "notepad++ unsaved backup"
-original_file: "C:\\Users\\bsach\\AppData\\Roaming\\Notepad++\\backup\\..."
+original_file: "C:\\Users\\YOU\\AppData\\Roaming\\Notepad++\\backup\\..."
 imported_at: "2026-05-02T11:44:59"
 category: "Tech_Debugging"
 sha256: "..."
@@ -749,20 +804,6 @@ First confirm:
 5. `data/raw_backups/` contains a full backup
 
 Only then consider resetting the Notepad++ active session.
-
-### Avoid repeatedly running import
-
-The current importer does not yet persistently deduplicate across separate import runs.
-
-If you run:
-
-```powershell
-python main.py import
-```
-
-multiple times, it may create duplicate Markdown notes in `vault/`.
-
-This should be fixed in a future version.
 
 ### Do not commit raw backups publicly
 

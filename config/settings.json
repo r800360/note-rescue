@@ -1,0 +1,8 @@
+{
+  "auto_reset_threshold": 100,
+  "auto_reset_after_sync": true,
+  "notify_after_sync": true,
+  "default_open_target": "notepad++",
+  "recent_days_default": 7,
+  "sync_schedule_hour": 21
+}
