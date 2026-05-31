@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import datetime
 import os
 import re
+import shutil
 from types import SimpleNamespace
 
 from rich.console import Console
@@ -32,6 +33,27 @@ from .scholars import (
     build_handoff_paragraph,
     load_scholars_config,
 )
+from .chatbot import ask_vault
+from .chat_corrections import add_correction, load_corrections
+from .secrets import get_openai_api_key, secrets_setup_hint
+from .site_paths import (
+    PROFILE_EXAMPLE,
+    PROFILE_PUBLIC,
+    SITE_DIST_DIR,
+    SITE_SOURCES_DIR,
+    ensure_site_dirs,
+)
+from .site_draft import draft_site_content
+from .site_content import (
+    latest_draft_path,
+    load_json_file,
+    merge_content,
+    load_profile,
+    save_draft,
+    save_public_content,
+)
+from .site_build import build_site, open_built_site, review_public_text
+from .paths import PROJECT_ROOT
 
 console = Console()
 
@@ -544,6 +566,8 @@ def cmd_go(args):
         "",
         "[bold]Quick commands:[/bold]",
         '  find-notes.cmd  or  python main.py find "meeting notes"',
+        '  ask.cmd           or  python main.py ask "what was I working on?"',
+        "  site.cmd          — public personal site (review before deploy)",
         "  todos.cmd                               # refresh + open TODOs",
         "  sync-now.cmd                            # rescue now (not only 9 PM)",
         "  python main.py reset --apply            # fresh Notepad++ session",
@@ -667,6 +691,219 @@ def cmd_scholar(args):
     if getattr(args, "open_notes", False) and profile.vault_hits:
         open_path(Path(profile.vault_hits[0]["path"]))
         console.print("[green]Opened top related vault note in Notepad++[/green]")
+
+
+def _ask_query_parts(args) -> list[str]:
+    raw = getattr(args, "query", None)
+    if raw is None:
+        raw = getattr(args, "question", [])
+    if isinstance(raw, str):
+        return [raw] if raw.strip() else []
+    return [p for p in (raw or []) if p]
+
+
+def cmd_ask(args):
+    """Ask the LLM about your rescued notes (retrieval + OpenAI)."""
+    parts = _ask_query_parts(args)
+
+    if parts and parts[0].lower() == "correct":
+        text = " ".join(parts[1:]).strip()
+        args.text = text
+        cmd_ask_correct(args)
+        return
+
+    if parts and parts[0].lower() in {"corrections", "correction"}:
+        cmd_ask_corrections(args)
+        return
+
+    if not get_openai_api_key():
+        console.print("[red]OpenAI API key not configured.[/red]")
+        console.print(secrets_setup_hint())
+        return
+
+    question = " ".join(parts).strip()
+
+    if not question:
+        console.print("[yellow]Provide a question, or double-click ask.cmd for interactive mode.[/yellow]")
+        console.print('Example: python main.py ask "student travel funds meeting"')
+        return
+
+    console.print("[dim]Searching vault and asking OpenAI...[/dim]")
+    try:
+        result = ask_vault(question)
+    except Exception as exc:
+        console.print(f"[red]Ask failed:[/red] {exc}")
+        return
+
+    console.print("")
+    console.print(Panel(result["answer"], title="Answer", border_style="green"))
+
+    sources = result.get("sources", [])
+    if sources:
+        console.print("")
+        console.print(f"[bold]Based on {len(sources)} note(s):[/bold]")
+        for block in sources[:5]:
+            console.print(f"  • [cyan]{block['rel_path']}[/cyan] — {block.get('title', '')[:50]}")
+        if len(sources) > 5:
+            console.print(f"  [dim]... and {len(sources) - 5} more[/dim]")
+
+    if getattr(args, "open", False) and sources:
+        from .open_utils import open_path
+
+        open_path(Path(sources[0]["path"]))
+        console.print(f"[green]Opened top source:[/green] {sources[0]['rel_path']}")
+
+    console.print("")
+    console.print(
+        "[dim]Wrong interpretation? Run: python main.py ask correct \"what I meant was ...\"[/dim]"
+    )
+
+
+def cmd_ask_correct(args):
+    text = getattr(args, "text", "") or ""
+    text = text.strip()
+    if not text:
+        console.print('[yellow]Provide correction text. Example:[/yellow]')
+        console.print('  python main.py ask correct "When I wrote TESC I meant travel scholarship"')
+        return
+
+    try:
+        row = add_correction(text)
+    except ValueError as exc:
+        console.print(f"[red]{exc}[/red]")
+        return
+
+    console.print("[green]Saved correction.[/green] Future answers will use it.")
+    console.print(f"[dim]{row['text']}[/dim]")
+    console.print(f"Total corrections: {len(load_corrections())}")
+
+
+def cmd_ask_corrections(args):
+    rows = load_corrections()
+    if not rows:
+        console.print("[yellow]No corrections saved yet.[/yellow]")
+        console.print('Add one: python main.py ask correct "..."')
+        return
+
+    table = Table(title="Your note clarifications (used by ask)")
+    table.add_column("When")
+    table.add_column("Correction")
+
+    for row in rows[-20:]:
+        table.add_row(row.get("added_at", ""), row["text"][:120])
+
+    console.print(table)
+    if len(rows) > 20:
+        console.print(f"[dim]Showing last 20 of {len(rows)}.[/dim]")
+
+
+def cmd_site(args):
+    """Build a privacy-reviewed public personal site from notes + curated profile."""
+    parts = _ask_query_parts(args)
+    action = (parts[0].lower() if parts else "help")
+
+    if action in {"help", "-h", "--help"} or not parts:
+        console.print(Panel(
+            "\n".join([
+                "[bold]site init[/bold]     — create folders + copy profile template",
+                "[bold]site draft[/bold]    — LLM draft from vault (optional: projects, values, reading, quotes, about)",
+                "[bold]site publish[/bold]  — merge latest draft + profile -> site/public/content.json",
+                "[bold]site build[/bold]    — static site -> site/dist/",
+                "[bold]site review[/bold]   — scan built site for emails/phones/PIDs",
+                "[bold]site open[/bold]     — open site/dist in browser",
+                "",
+                "See site/README.md. Never upload vault/ or unreviewed drafts.",
+            ]),
+            title="Personal site (public)",
+            border_style="cyan",
+        ))
+        return
+
+    if action == "init":
+        ensure_site_dirs()
+        if not PROFILE_PUBLIC.exists() and PROFILE_EXAMPLE.exists():
+            shutil.copy2(PROFILE_EXAMPLE, PROFILE_PUBLIC)
+            console.print(f"[green]Created[/green] {PROFILE_PUBLIC.relative_to(PROJECT_ROOT)}")
+        else:
+            console.print(f"[dim]Profile already exists:[/dim] {PROFILE_PUBLIC}")
+        console.print(f"[green]Ready.[/green] Edit profile, optionally add files to {SITE_SOURCES_DIR.name}/")
+        console.print("Then: [cyan]python main.py site draft[/cyan]")
+        return
+
+    if action == "draft":
+        if not get_openai_api_key():
+            console.print("[red]OpenAI API key not configured.[/red]")
+            console.print(secrets_setup_hint())
+            return
+        focus = parts[1] if len(parts) > 1 else "all"
+        extra = " ".join(parts[2:]).strip() if len(parts) > 2 else ""
+        console.print(f"[dim]Drafting public site content (focus={focus})...[/dim]")
+        try:
+            content = draft_site_content(focus=focus, extra_query=extra)
+            path = save_draft(content)
+        except Exception as exc:
+            console.print(f"[red]Draft failed:[/red] {exc}")
+            return
+        console.print(f"[green]Saved draft:[/green] {path}")
+        notes = content.get("draft_notes") or []
+        if notes:
+            console.print("[yellow]Verify before publishing:[/yellow]")
+            for note in notes[:8]:
+                console.print(f"  • {note}")
+        console.print("[dim]Edit the JSON if needed, then: python main.py site publish[/dim]")
+        return
+
+    if action == "publish":
+        latest = latest_draft_path()
+        if not latest:
+            console.print("[yellow]No draft found. Run: python main.py site draft[/yellow]")
+            return
+        profile = load_profile()
+        draft = load_json_file(latest)
+        merged = merge_content(profile, draft)
+        out = save_public_content(merged)
+        console.print(f"[green]Published to[/green] {out}")
+        console.print("[dim]Review the file, then: python main.py site build && python main.py site review[/dim]")
+        return
+
+    if action == "build":
+        try:
+            index = build_site()
+        except Exception as exc:
+            console.print(f"[red]Build failed:[/red] {exc}")
+            return
+        console.print(f"[green]Built site:[/green] {SITE_DIST_DIR}")
+        console.print(f"Open: {index}")
+        if getattr(args, "open", False):
+            open_built_site()
+        return
+
+    if action == "review":
+        content_path = SITE_DIST_DIR / "content.json"
+        if not content_path.exists():
+            console.print("[yellow]Run site build first.[/yellow]")
+            return
+        text = content_path.read_text(encoding="utf-8", errors="ignore")
+        issues = review_public_text(text)
+        if issues:
+            console.print("[bold red]Site review FAILED[/bold red]")
+            for issue in sorted(set(issues)):
+                console.print(f"  • possible {issue}")
+            console.print("Edit site/public/content.json or the draft, then publish + build again.")
+            return
+        console.print("[bold green]Site review passed[/bold green] — safe to upload site/dist/ only.")
+        return
+
+    if action == "open":
+        try:
+            open_built_site()
+            console.print("[green]Opened in your browser.[/green]")
+        except Exception as exc:
+            console.print(f"[red]{exc}[/red]")
+        return
+
+    console.print(f"[yellow]Unknown site command:[/yellow] {action}")
+    console.print("Run: [cyan]python main.py site help[/cyan]")
 
 
 def cmd_privacy_check(args):

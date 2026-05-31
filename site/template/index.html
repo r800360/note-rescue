@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Personal site — projects, values, and research interests" />
+  <title>Loading…</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="hero" id="top">
+    <nav class="nav">
+      <span class="logo" id="nav-name">…</span>
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark theme">◐</button>
+    </nav>
+    <div class="hero-inner">
+      <p class="eyebrow" id="location"></p>
+      <h1 id="headline"></h1>
+      <p class="lede" id="tagline"></p>
+      <div class="hero-links" id="hero-links"></div>
+    </div>
+    <div class="hero-glow" aria-hidden="true"></div>
+  </header>
+
+  <main id="main">
+    <section class="section" id="about-section">
+      <h2>About</h2>
+      <div class="prose" id="about"></div>
+    </section>
+
+    <section class="section" id="values-section">
+      <h2>Values</h2>
+      <ul class="pill-list" id="values"></ul>
+    </section>
+
+    <section class="section" id="interests-section">
+      <h2>Across disciplines</h2>
+      <ul class="pill-list accent" id="interests"></ul>
+    </section>
+
+    <section class="section" id="projects-section">
+      <h2>Projects &amp; work</h2>
+      <div class="cards" id="projects"></div>
+    </section>
+
+    <section class="section" id="reading-section">
+      <h2>Reading &amp; papers</h2>
+      <div class="cards compact" id="reading"></div>
+    </section>
+
+    <section class="section" id="quotes-section">
+      <h2>Quotes</h2>
+      <div class="quotes" id="quotes"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Built with note-rescue · <span id="year"></span></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -68,7 +68,13 @@ Write-Host "  todos.cmd           # refresh + open TODO list"
 Write-Host "  reset-npp.cmd       # sync + fresh Notepad++ session"
 Write-Host "  doctor.cmd          # health check"
 Write-Host "  inbox.cmd           # open Inbox folder"
+Write-Host "  ask.cmd             # ask AI about your notes (needs config\secrets.local.json)"
 Write-Host ""
+if (!(Test-Path (Join-Path $ProjectRoot "config\secrets.local.json"))) {
+    Write-Host "Optional: copy config\secrets.example.json to config\secrets.local.json"
+    Write-Host "          and add your OpenAI API key for ask.cmd"
+    Write-Host ""
+}
 Write-Host "Or: python main.py go"
 Write-Host ""
 Read-Host "Press Enter to close"

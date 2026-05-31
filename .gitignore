@@ -19,6 +19,19 @@ data/scholars/
 # Local settings overrides (optional)
 config/settings.local.json
 
+# Private API keys and chat memory (NEVER commit)
+config/secrets.local.json
+.env
+data/chat_corrections.json
+data/chat_sessions/
+
+# Personal site — drafts and built output stay local until you review
+config/site.profile.public.json
+site/drafts/
+site/sources/
+site/public/
+site/dist/
+
 # Python
 .venv/
 __pycache__/

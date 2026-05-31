@@ -137,6 +137,18 @@ def generate_auto_section() -> str:
     lines.append(
         "| `python main.py scholar list` | List PATHS scholars (local config). |"
     )
+    lines.append(
+        '| `python main.py ask "question"` | Ask OpenAI about your vault notes (needs local API key). |'
+    )
+    lines.append(
+        '| `python main.py ask correct "..."` | Save a clarification for messy/shorthand notes. |'
+    )
+    lines.append(
+        "| `python main.py site draft` | Draft public site content from vault (review before deploy). |"
+    )
+    lines.append(
+        "| `python main.py site build` | Build static site to `site/dist/`. |"
+    )
     lines.append("")
     lines.append("### Double-click launchers (Windows)")
     lines.append("")
@@ -151,6 +163,8 @@ def generate_auto_section() -> str:
     lines.append("| `inbox.cmd` | Open Inbox |")
     lines.append("| `privacy-check.cmd` | Pre-push privacy scan |")
     lines.append("| `scholar.cmd` | Scholar meeting prep |")
+    lines.append("| `ask.cmd` | Ask questions about your notes (AI) |")
+    lines.append("| `site.cmd` | Draft & build public personal site |")
     lines.append("")
 
     lines.append("### Current Notepad++ health snapshot")

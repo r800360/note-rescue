@@ -1,0 +1,19 @@
+{
+  "name": "Your Name",
+  "tagline": "Math · Physics · Engineering · CS — one line for recruiters and visitors",
+  "location_public": "UC San Diego area",
+  "email_public": "",
+  "links": [
+    { "label": "GitHub", "url": "https://github.com/yourhandle" },
+    { "label": "LinkedIn", "url": "https://linkedin.com/in/yourhandle" }
+  ],
+  "include_sections": ["about", "values", "projects", "quotes", "reading", "interests"],
+  "tone": "warm, clear, professional but approachable for UCSD students and faculty",
+  "never_include": [
+    "student grades or evaluations",
+    "private mentor/scholar notes",
+    "health or disability details unless you add them manually to profile",
+    "home address or personal phone",
+    "other people's full names without consent"
+  ]
+}

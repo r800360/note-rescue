@@ -42,6 +42,8 @@ Pin these to your taskbar or desktop if you like:
 | `inbox.cmd` | Open `vault/Inbox/` |
 | `privacy-check.cmd` | Before pushing this repo to public GitHub |
 | `scholar.cmd` | scholar meeting prep (optional; needs local config) |
+| `ask.cmd` | Ask AI about your rescued notes (memory helper) |
+| `site.cmd` | Build a reviewed public personal website |
 
 ### Command-line shortcuts
 
@@ -54,6 +56,7 @@ python main.py open todos                  # global TODO file
 python main.py today                       # notes rescued today
 python main.py recent                      # last 7 days
 python main.py inbox                       # open Inbox
+python main.py ask "what was I working on?"  # AI answers from your vault
 ```
 
 **Auto-reset:** when you have **100+** unsaved tabs and sync has already imported everything new, sync can automatically reset Notepad++ (see `config/settings.json`).
@@ -73,7 +76,75 @@ python main.py inbox                       # open Inbox
 - Scheduled daily sync, smoke test, privacy check, cleanup reports
 - Optional **scholar** profiles and handoff summaries (`config/scholars.json`)
 
-Out of scope for this repo: semantic/vector search, web UI, automatic note merging or LLM summarization.
+Optional **AI ask** (`ask.cmd`): searches your vault, sends the best-matching excerpts to OpenAI, and answers in plain English — useful when keyword search is not enough and you need a quick reminder of what you were working on.
+
+---
+
+## Ask your notes (AI memory helper)
+
+For “what was I doing about X?” when you do not remember which file it is in:
+
+### One-time API key setup
+
+```powershell
+copy config\secrets.example.json config\secrets.local.json
+# Edit secrets.local.json and paste your OpenAI API key (this file is gitignored)
+```
+
+Or set `OPENAI_API_KEY` in your environment. Never commit `config/secrets.local.json`.
+
+### Daily use (lazy)
+
+1. Double-click **`ask.cmd`**.
+2. Type a question in plain English, e.g. `What did I write about student travel funds?`
+3. Read the answer; source note paths are listed under it.
+
+**Fix shorthand the AI misread:** in the ask window, type:
+
+```text
+correct: When I wrote "TESC funds" I meant the travel scholarship deadline
+```
+
+Or from the command line:
+
+```powershell
+python main.py ask correct "When I wrote TESC I meant travel scholarship"
+python main.py ask corrections   # list saved clarifications
+```
+
+Corrections are stored in `data/chat_corrections.json` (gitignored) and included in future answers.
+
+**Open the source note:** after an answer, type `open` in the ask window, or run `python main.py ask "your question" --open`.
+
+How it works: your question is matched against the vault using the same search as `find`, then the top note excerpts plus your corrections go to OpenAI (`gpt-4o-mini` by default). Answers only use what is in those excerpts — if nothing matches, it will say so honestly.
+
+---
+
+## Personal website (hiring + UCSD intro, privacy-safe)
+
+You **can** use note-rescue to help build a public site about you (projects, values, quotes, reading list, math/physics/engineering/CS breadth) — but **not** by publishing your vault or raw `ask` answers.
+
+| Tool | Private or public? |
+|------|-------------------|
+| `ask.cmd` | **Private** — memory helper only |
+| `site.cmd` | **Public** — drafts with redaction rules, you review before deploy |
+
+**Golden rule:** Only upload `site/dist/` after you read the draft and `site review` passes.
+
+### Lazy workflow
+
+1. Double-click **`site.cmd`** → choose **1** (first-time setup).
+2. Edit `config/site.profile.public.json` (name, tagline, GitHub/LinkedIn — only what you want on the web).
+3. Optionally copy resume blurbs or project summaries into `site/sources/` as `.md` files.
+4. **Draft from notes:** `site.cmd` → **2**, or `python main.py site draft projects`.
+5. Open `site/drafts/draft-*.json` — delete anything too personal (scholar notes, grades, other people's names).
+6. **Publish + build:** `site.cmd` → **3**, or `python main.py site publish` then `site build`.
+7. **Review:** `site.cmd` → **4** — blocks emails, phone numbers, and UCSD PIDs in the built site.
+8. Upload **only** `site/dist/` to GitHub Pages, Netlify, etc.
+
+The template is a lightweight single page (light/dark theme, cards for projects and reading). Use `ask` when you need to *remember* what you wrote; use `site draft` when you need *publishable* copy.
+
+Details: [site/README.md](site/README.md)
 
 ---
 
@@ -90,6 +161,15 @@ Out of scope for this repo: semantic/vector search, web UI, automatic note mergi
 | `recent_days_default` | `7` | Window for `recent` command |
 | `sync_schedule_hour` | `21` | Hour for scheduled task (9 PM) |
 
+`config/secrets.local.json` (gitignored, copy from `secrets.example.json`):
+
+| Key | Default | Meaning |
+|---|---|---|
+| `openai_api_key` | (required for ask) | Your OpenAI API key |
+| `openai_model` | `gpt-4o-mini` | Chat model |
+| `chat_max_notes` | `10` | Max vault notes sent as context |
+| `chat_max_chars_per_note` | `6000` | Truncate each note excerpt |
+
 ---
 
 ## Project layout
@@ -102,7 +182,8 @@ note-rescue/
 ├── config/
 │   ├── categories.json
 │   ├── settings.json
-│   └── scholars.example.json
+│   ├── scholars.example.json
+│   └── secrets.example.json   # copy to secrets.local.json (gitignored)
 ├── data/                   # backups, state, reports (gitignored)
 ├── vault/                  # rescued Markdown notes (gitignored by default)
 └── src/note_rescue/        # Python package
@@ -148,6 +229,9 @@ Run from the project root with the venv activated (or use `.venv\Scripts\python.
 | `recent` / `today` | Recently imported notes |
 | `open vault\|inbox\|todos` | Open in Notepad++, VS Code, or Explorer |
 | `privacy-check` | Scan tracked files before a public push |
+| `ask "question"` | Ask OpenAI about your vault (needs `secrets.local.json`) |
+| `ask correct "..."` | Save a clarification for messy notes |
+| `ask corrections` | List saved clarifications |
 
 Example import output:
 
@@ -233,7 +317,7 @@ Rescue first, classify roughly, extract obvious action items, search immediately
 
 > This section is automatically generated. Do not edit this section by hand.
 
-Last updated: `2026-05-31T11:51:01`
+Last updated: `2026-05-31T12:08:58`
 
 ### Available CLI commands
 
@@ -259,7 +343,9 @@ Last updated: `2026-05-31T11:51:01`
 | `python main.py rebuild-state` | Rebuild import dedup state from vault frontmatter. |
 | `python main.py smoke-test` | Basic project health checks. |
 | `python main.py privacy-check` | Scan tracked files before a public git push. |
-| `python main.py scholar list` | List scholars (local config). |
+| `python main.py scholar list` | List PATHS scholars (local config). |
+| `python main.py ask "question"` | Ask OpenAI about your vault notes (needs local API key). |
+| `python main.py ask correct "..."` | Save a clarification for messy/shorthand notes. |
 
 ### Double-click launchers (Windows)
 
@@ -274,6 +360,7 @@ Last updated: `2026-05-31T11:51:01`
 | `inbox.cmd` | Open Inbox |
 | `privacy-check.cmd` | Pre-push privacy scan |
 | `scholar.cmd` | Scholar meeting prep |
+| `ask.cmd` | Ask questions about your notes (AI) |
 
 ### Current Notepad++ health snapshot
 
@@ -324,6 +411,6 @@ Health note: **Healthy. Notepad++ session size is manageable.**
 |---|---:|
 | State file exists | `True` |
 | Known imported hashes | `2090` |
-| State last updated | `2026-05-31T11:08:03` |
+| State last updated | `2026-05-31T12:08:31` |
 
 <!-- AUTO-GENERATED:END -->

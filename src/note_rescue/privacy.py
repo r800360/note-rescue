@@ -11,8 +11,11 @@ SCHOLARS_LOCAL_PATH = CONFIG_DIR / "scholars.local.json"
 PRIVATE_PATHS = [
     CONFIG_DIR / "scholars.local.json",
     CONFIG_DIR / "scholars.json",
+    CONFIG_DIR / "secrets.local.json",
+    CONFIG_DIR / "site.profile.public.json",
     PROJECT_ROOT / "vault",
     PROJECT_ROOT / "data" / "scholars",
+    PROJECT_ROOT / "data" / "chat_corrections.json",
 ]
 
 EMAIL_PATTERN = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")

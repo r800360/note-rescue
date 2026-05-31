@@ -28,6 +28,8 @@ from note_rescue.cli import (
     cmd_go,
     cmd_scholar,
     cmd_privacy_check,
+    cmd_ask,
+    cmd_site,
 )
 
 
@@ -244,6 +246,40 @@ def build_parser():
         help="Scan tracked files for private data before pushing to public GitHub.",
     )
     privacy_parser.set_defaults(func=cmd_privacy_check)
+
+    ask_parser = subparsers.add_parser(
+        "ask",
+        help="Ask OpenAI about your rescued notes (uses local vault search + your API key).",
+    )
+    ask_parser.add_argument(
+        "query",
+        nargs=argparse.REMAINDER,
+        default=[],
+        help="Question, or: correct <text> / corrections",
+    )
+    ask_parser.add_argument(
+        "--open",
+        action="store_true",
+        help="Open the top source note in Notepad++ after answering.",
+    )
+    ask_parser.set_defaults(func=cmd_ask)
+
+    site_parser = subparsers.add_parser(
+        "site",
+        help="Draft and build a public personal website (review before deploy).",
+    )
+    site_parser.add_argument(
+        "query",
+        nargs=argparse.REMAINDER,
+        default=[],
+        help="init | draft [focus] | publish | build | review | open | help",
+    )
+    site_parser.add_argument(
+        "--open",
+        action="store_true",
+        help="Open built site in browser after build.",
+    )
+    site_parser.set_defaults(func=cmd_site)
 
     return parser
 
