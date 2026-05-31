@@ -1,4 +1,4 @@
-# Quick Notepad++ health check — are you accumulating too many tabs?
+# Quick Notepad++ health check  -  are you accumulating too many tabs?
 $ErrorActionPreference = "Continue"
 
 $ProjectRoot = $PSScriptRoot

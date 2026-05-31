@@ -1,4 +1,4 @@
-# Run sync immediately (backup + import + todos) — don't wait for 9 PM.
+# Run sync immediately (backup + import + todos)  -  don't wait for 9 PM.
 $ErrorActionPreference = "Continue"
 
 $ProjectRoot = $PSScriptRoot

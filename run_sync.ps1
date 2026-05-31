@@ -1,4 +1,4 @@
-# Daily sync wrapper — invoked by Windows Scheduled Task at 9 PM.
+# Daily sync wrapper  -  invoked by Windows Scheduled Task at 9 PM.
 $ProjectRoot = $PSScriptRoot
 $LogDir = Join-Path $ProjectRoot "data\logs"
 $VenvPython = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
@@ -30,7 +30,7 @@ try {
     & $Python main.py sync 2>&1 | Tee-Object -FilePath $LogFile -Append
     $ExitCode = $LASTEXITCODE
 } catch {
-    Write-Log "ERROR: sync failed — $_"
+    Write-Log "ERROR: sync failed  -  $_"
     $ExitCode = 1
 
     # Toast on failure (sync success toast is handled by Python)

@@ -14,4 +14,4 @@ echo.
 echo Open the CSV in Excel or Google Sheets and paste into your spreadsheet.
 echo File: %OUT%
 echo.
-Read-Host "Press Enter to close"
+pause

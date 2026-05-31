@@ -30,4 +30,4 @@ if "%TOPIC%"=="" (
 
 :done
 echo.
-Read-Host "Press Enter to close"
+pause

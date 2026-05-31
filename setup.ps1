@@ -65,7 +65,7 @@ if (!(Test-Path $SecretsPath) -and -not $env:OPENAI_API_KEY) {
     if ($AskSetup -eq "y" -or $AskSetup -eq "Y") {
         $Example = Join-Path $ProjectRoot "config\secrets.example.json"
         Copy-Item $Example $SecretsPath
-        Write-Host "Created config\secrets.local.json — paste your OpenAI API key, then run ask.cmd"
+        Write-Host "Created config\secrets.local.json  -  paste your OpenAI API key, then run ask.cmd"
         Start-Process notepad.exe $SecretsPath
     }
 }
@@ -74,9 +74,9 @@ Write-Host ""
 Write-Host "=== Setup complete ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "What's next (recommended order):"
-Write-Host "  1. Double-click go.cmd          — your home base (status + next steps)"
-Write-Host "  2. Pin launchers you use daily  — run pin-shortcuts.ps1 for Start menu + taskbar"
-Write-Host "  3. Read WORKFLOWS.md            — one-page 'I want X -> run Y' guide"
+Write-Host "  1. Double-click go.cmd           -  your home base (status + next steps)"
+Write-Host "  2. Pin launchers you use daily   -  run pin-shortcuts.ps1 for Start menu + taskbar"
+Write-Host "  3. Read WORKFLOWS.md             -  one-page 'I want X -> run Y' guide"
 Write-Host ""
 Write-Host "Daily launchers (double-click):"
 Write-Host "  go.cmd              dashboard + next steps"

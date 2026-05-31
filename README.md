@@ -325,7 +325,7 @@ Rescue first, classify roughly, extract obvious action items, search immediately
 
 > This section is automatically generated. Do not edit this section by hand.
 
-Last updated: `2026-05-31T12:08:58`
+Last updated: `2026-05-31T12:47:59`
 
 ### Available CLI commands
 
@@ -339,7 +339,8 @@ Last updated: `2026-05-31T12:08:58`
 | `python main.py sync` | Back up, import new notes, and extract TODOs. |
 | `python main.py doctor` | Diagnose whether Notepad++ is accumulating too many unsaved tabs. |
 | `python main.py update-readme` | Refresh this auto-generated README section. |
-| `python main.py go` | Lazy dashboard — status, todos, quick commands. |
+| `python main.py go` | Lazy dashboard — status, todos, next steps. |
+| `python main.py workflows [--open]` | One-page workflow quick reference. |
 | `python main.py find "query"` | Search and open top result in Notepad++. |
 | `python main.py reset [--apply]` | Preview or perform safe Notepad++ session reset. |
 | `python main.py open todos` | Open global TODO list. |
@@ -354,12 +355,15 @@ Last updated: `2026-05-31T12:08:58`
 | `python main.py scholar list` | List PATHS scholars (local config). |
 | `python main.py ask "question"` | Ask OpenAI about your vault notes (needs local API key). |
 | `python main.py ask correct "..."` | Save a clarification for messy/shorthand notes. |
+| `python main.py site draft` | Draft public site content from vault (review before deploy). |
+| `python main.py site build` | Build static site to `site/dist/`. |
 
 ### Double-click launchers (Windows)
 
 | File | What it does |
 |---|---|
-| `go.cmd` | Dashboard |
+| `go.cmd` | Dashboard + next steps |
+| `workflows.cmd` | Open workflow quick-reference guide |
 | `sync-now.cmd` | Run sync now |
 | `find-notes.cmd` | Interactive search |
 | `todos.cmd` | Refresh + open TODOs (`todos.cmd apply` to clear checked items) |
@@ -369,6 +373,7 @@ Last updated: `2026-05-31T12:08:58`
 | `privacy-check.cmd` | Pre-push privacy scan |
 | `scholar.cmd` | Scholar meeting prep |
 | `ask.cmd` | Ask questions about your notes (AI) |
+| `site.cmd` | Draft & build public personal site |
 
 ### Current Notepad++ health snapshot
 
@@ -419,6 +424,6 @@ Health note: **Healthy. Notepad++ session size is manageable.**
 |---|---:|
 | State file exists | `True` |
 | Known imported hashes | `2090` |
-| State last updated | `2026-05-31T12:08:31` |
+| State last updated | `2026-05-31T12:47:58` |
 
 <!-- AUTO-GENERATED:END -->

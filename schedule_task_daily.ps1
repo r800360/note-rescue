@@ -11,7 +11,7 @@ if (Test-Path $SettingsPath) {
             $Hour = [int]$Settings.sync_schedule_hour
         }
     } catch {
-        Write-Host "Could not read sync_schedule_hour from settings.json — using 9 PM" -ForegroundColor Yellow
+        Write-Host "Could not read sync_schedule_hour from settings.json  -  using 9 PM" -ForegroundColor Yellow
     }
 }
 

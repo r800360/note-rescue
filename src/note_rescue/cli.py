@@ -792,7 +792,7 @@ def cmd_ask(args):
         console.print("")
         console.print(f"[bold]Based on {len(sources)} note(s):[/bold]")
         for block in sources[:5]:
-            console.print(f"  • [cyan]{block['rel_path']}[/cyan] — {block.get('title', '')[:50]}")
+            console.print(f"  - [cyan]{block['rel_path']}[/cyan] - {block.get('title', '')[:50]}")
         if len(sources) > 5:
             console.print(f"  [dim]... and {len(sources) - 5} more[/dim]")
 

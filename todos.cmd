@@ -24,4 +24,5 @@ echo Until step 3, checked items stay in the list and show on go.cmd.
 echo.
 
 :done
-Read-Host "Press Enter to close"
+echo.
+pause

@@ -6,4 +6,4 @@ if not exist %PYTHON% set PYTHON=python
 
 %PYTHON% main.py open inbox
 echo.
-Read-Host "Press Enter to close"
+pause
