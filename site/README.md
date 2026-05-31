@@ -28,7 +28,7 @@ This folder is for a **public** personal website built from curated content — 
 
 | Tool | Use for |
 |------|---------|
-| `ask.cmd` | Private memory — "what did I write about X?" |
+| `ask.cmd` | Private vault search — "what did I write about X?" |
 | `site draft` | Public website copy — strict redaction rules |
 
 Do not paste `ask` answers straight onto the web.

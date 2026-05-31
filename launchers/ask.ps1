@@ -18,7 +18,7 @@ if (!(Test-Path $Secrets) -and -not $env:OPENAI_API_KEY) {
 }
 
 Write-Host ""
-Write-Host "  note-rescue — ask your notes (AI memory helper)" -ForegroundColor Cyan
+Write-Host "  note-rescue — ask your notes (AI vault search)" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "Type a question in plain English. Examples:"
 Write-Host "  What was I working on for student travel?"

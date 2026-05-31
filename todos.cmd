@@ -15,11 +15,12 @@ echo Refreshing TODO list and opening in Notepad++...
 echo.
 %PYTHON% main.py todos --open
 echo.
-echo HOW TO CLEAR ITEMS:
-echo   1. Change - [ ] to - [x] for done or not relevant
-echo   2. Save the file in Notepad++
-echo   3. Double-click todos.cmd again and type: apply
-echo      Or run: todos.cmd apply
+echo TODO CLEANUP — 3 STEPS (complete all three):
+echo   Step 1: Done — list is open in Notepad++
+echo   Step 2: Change - [ ] to - [x] for done or not relevant, then SAVE
+echo   Step 3: Run todos.cmd apply  (or double-click todos.cmd and type: apply)
+echo.
+echo Until step 3, checked items stay in the list and show on go.cmd.
 echo.
 
 :done

@@ -26,6 +26,7 @@ from note_rescue.cli import (
     cmd_recent,
     cmd_today,
     cmd_go,
+    cmd_workflows,
     cmd_scholar,
     cmd_privacy_check,
     cmd_ask,
@@ -188,6 +189,17 @@ def build_parser():
     )
     go_parser.add_argument("--open-todos", action="store_true", help="Also open global_todos.md.")
     go_parser.set_defaults(func=cmd_go)
+
+    workflows_parser = subparsers.add_parser(
+        "workflows",
+        help="Show the one-page workflow quick reference (what to run for each goal).",
+    )
+    workflows_parser.add_argument(
+        "--open",
+        action="store_true",
+        help="Open WORKFLOWS.md in your default editor.",
+    )
+    workflows_parser.set_defaults(func=cmd_workflows)
 
     scholar_parser = subparsers.add_parser(
         "scholar",

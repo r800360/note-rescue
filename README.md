@@ -6,6 +6,9 @@ Notepad++ is a great scratchpad, but thousands of open unsaved tabs can slow it 
 
 Non-destructive by default: backups are copied, sessions are renamed (not deleted), and imports skip duplicates across runs.
 
+> **Quick reference:** [WORKFLOWS.md](WORKFLOWS.md) — one page of “I want X → run Y” for every common task.  
+> **Private vs public:** `ask.cmd` stays on your machine. `site.cmd` builds content for the web — review before deploy.
+
 ---
 
 ## Lazy user quick start
@@ -42,13 +45,14 @@ Pin these to your taskbar or desktop if you like:
 | `inbox.cmd` | Open `vault/Inbox/` |
 | `privacy-check.cmd` | Before pushing this repo to public GitHub |
 | `scholar.cmd` | scholar meeting prep (optional; needs local config) |
-| `ask.cmd` | Ask AI about your rescued notes (memory helper) |
+| `ask.cmd` | Ask AI about your rescued notes (local vault search) |
 | `site.cmd` | Build a reviewed public personal website |
 
 ### Command-line shortcuts
 
 ```powershell
 python main.py go                          # dashboard
+python main.py workflows                   # quick-reference guide
 python main.py find "student travel funds"   # search + open (add --pick to choose)
 python main.py sync                        # backup + import + todos
 python main.py doctor                      # health check
@@ -76,11 +80,11 @@ python main.py ask "what was I working on?"  # AI answers from your vault
 - Scheduled daily sync, smoke test, privacy check, cleanup reports
 - Optional **scholar** profiles and handoff summaries (`config/scholars.json`)
 
-Optional **AI ask** (`ask.cmd`): searches your vault, sends the best-matching excerpts to OpenAI, and answers in plain English — useful when keyword search is not enough and you need a quick reminder of what you were working on.
+Optional **AI ask** (`ask.cmd`): searches your vault, sends the best-matching excerpts to OpenAI, and answers in plain English — useful when keyword search is not enough and you need a quick summary of what you wrote.
 
 ---
 
-## Ask your notes (AI memory helper)
+## Ask your notes (AI vault search)
 
 For “what was I doing about X?” when you do not remember which file it is in:
 
@@ -137,12 +141,12 @@ You **can** use note-rescue to help build a public site about you (projects, val
 2. Edit `config/site.profile.public.json` (name, tagline, GitHub/LinkedIn — only what you want on the web).
 3. Optionally copy resume blurbs or project summaries into `site/sources/` as `.md` files.
 4. **Draft from notes:** `site.cmd` → **2**, or `python main.py site draft projects`.
-5. Open `site/drafts/draft-*.json` — delete anything too personal (scholar notes, grades, other people's names).
-6. **Publish + build:** `site.cmd` → **3**, or `python main.py site publish` then `site build`.
-7. **Review:** `site.cmd` → **4** — blocks emails, phone numbers, and UCSD PIDs in the built site.
+5. **Review draft:** `site.cmd` → **3** — opens `site/drafts/draft-*.json`; delete anything too personal.
+6. **Publish + build:** `site.cmd` → **4**, or `python main.py site publish` then `site build`.
+7. **Review:** `site.cmd` → **5** — blocks emails, phone numbers, and UCSD PIDs in the built site.
 8. Upload **only** `site/dist/` to GitHub Pages, Netlify, etc.
 
-The template is a lightweight single page (light/dark theme, cards for projects and reading). Use `ask` when you need to *remember* what you wrote; use `site draft` when you need *publishable* copy.
+The template is a lightweight single page (light/dark theme, cards for projects and reading). Use `ask` when you need to *search* what you wrote; use `site draft` when you need *publishable* copy.
 
 Details: [site/README.md](site/README.md)
 
@@ -297,7 +301,11 @@ Renames `session.xml` and `backup/` with a timestamp, then creates a fresh empty
 
 **PowerShell won’t activate venv** — `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`, then retry.
 
-**Notepad++ still slow after import** — Import does not clear the active session. Use `reset-npp.cmd` or `python main.py reset --apply`.
+**Notepad++ still slow after import** — Import copies notes to `vault/`; it does not close open tabs. Use `reset-npp.cmd` or `python main.py reset --apply`.
+
+**Scheduled sync failed** — Check `data/logs/sync_*.log` for the error message.
+
+**Not sure which launcher to use** — Double-click `workflows.cmd` or run `python main.py workflows`.
 
 **Search feels broad** — Use more specific words or `find --pick`. Phrase matches and all-term hits rank highest.
 

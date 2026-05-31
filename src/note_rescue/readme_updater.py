@@ -99,7 +99,10 @@ def generate_auto_section() -> str:
         "| `python main.py update-readme` | Refresh this auto-generated README section. |"
     )
     lines.append(
-        "| `python main.py go` | Lazy dashboard — status, todos, quick commands. |"
+        "| `python main.py go` | Lazy dashboard — status, todos, next steps. |"
+    )
+    lines.append(
+        "| `python main.py workflows [--open]` | One-page workflow quick reference. |"
     )
     lines.append(
         '| `python main.py find "query"` | Search and open top result in Notepad++. |'
@@ -154,7 +157,8 @@ def generate_auto_section() -> str:
     lines.append("")
     lines.append("| File | What it does |")
     lines.append("|---|---|")
-    lines.append("| `go.cmd` | Dashboard |")
+    lines.append("| `go.cmd` | Dashboard + next steps |")
+    lines.append("| `workflows.cmd` | Open workflow quick-reference guide |")
     lines.append("| `sync-now.cmd` | Run sync now |")
     lines.append("| `find-notes.cmd` | Interactive search |")
     lines.append("| `todos.cmd` | Refresh + open TODOs (`todos.cmd apply` to clear checked items) |")

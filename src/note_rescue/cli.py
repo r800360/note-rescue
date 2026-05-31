@@ -54,6 +54,12 @@ from .site_content import (
 )
 from .site_build import build_site, open_built_site, review_public_text
 from .paths import PROJECT_ROOT
+from .workflows import (
+    WORKFLOWS_PATH,
+    count_checked_todos_pending_apply,
+    count_open_todos,
+    format_next_actions_panel,
+)
 
 console = Console()
 
@@ -390,6 +396,11 @@ def cmd_sync(args):
         toast_body = f"{imported} new notes imported. {status['active_backup_files']} tabs open ({risk})."
         if reset_msg:
             toast_body += reset_msg
+        checked = count_checked_todos_pending_apply()
+        if checked:
+            toast_body += f" {checked} checked TODO(s) - run todos.cmd apply."
+        elif status["active_backup_files"] >= int(settings.get("auto_reset_threshold", 100)):
+            toast_body += " Consider reset-npp.cmd for a fresh session."
         show_toast("note-rescue sync done", toast_body)
 
 
@@ -407,9 +418,14 @@ def cmd_doctor(args):
 
     if risk in {"LOW", "MODERATE"}:
         console.print("[green]No urgent action needed.[/green]")
-        console.print("Your 9 PM daily sync handles rescue automatically.")
+        console.print("Your daily sync handles rescue automatically.")
         if status["active_backup_files"] >= 50:
             console.print(f"[dim]Tip: auto-reset kicks in at {threshold} tabs after sync imports everything.[/dim]")
+        if status["active_backup_files"] >= 30:
+            console.print(
+                "[dim]Note: sync copies notes to vault/ — it does not close Notepad++ tabs. "
+                "Use reset-npp.cmd when you want a fresh session.[/dim]"
+            )
         return
 
     console.print("[yellow]Recommended:[/yellow] run [cyan]python main.py sync[/cyan]")
@@ -531,53 +547,86 @@ def cmd_go(args):
     status = get_notepadpp_status()
     risk, message = get_risk_level(status["active_backup_files"])
     state = load_state()
-    settings = load_settings()
-    threshold = int(settings.get("auto_reset_threshold", 100))
 
     today = list_today_notes(limit=100)
     recent = list_recent_notes(days=7, limit=100)
 
     todo_path = VAULT_DIR / "TODO" / "global_todos.md"
-    todo_count = 0
-    if todo_path.exists():
-        todo_count = todo_path.read_text(encoding="utf-8", errors="ignore").count("- [ ]")
+    todo_count = count_open_todos(todo_path)
+    checked_pending = count_checked_todos_pending_apply(todo_path)
 
     inbox_count = len(list((VAULT_DIR / "Inbox").rglob("*.md"))) if (VAULT_DIR / "Inbox").exists() else 0
 
     risk_color = {"LOW": "green", "MODERATE": "yellow", "HIGH": "yellow", "VERY HIGH": "red", "EMERGENCY": "red"}.get(risk, "white")
 
+    todo_line = f"[bold]TODOs:[/bold] {todo_count} open"
+    if checked_pending:
+        todo_line += f" | [yellow]{checked_pending} checked - run todos.cmd apply[/yellow]"
+
     lines = [
         f"[bold]Risk:[/bold] [{risk_color}]{risk}[/{risk_color}] - {status['active_backup_files']} unsaved tabs",
         f"[bold]Vault:[/bold] {status['vault_notes']} notes ({inbox_count} in Inbox)",
-        f"[bold]TODOs:[/bold] {todo_count} open items",
+        todo_line,
         f"[bold]Today:[/bold] {len(today)} notes rescued | [bold]This week:[/bold] {len(recent)} notes",
         f"[bold]Last sync:[/bold] {state.get('last_sync_at', 'never')}",
-        "",
     ]
 
-    if status["active_backup_files"] >= threshold:
-        lines.append(f"[yellow]Action: {status['active_backup_files']} tabs >= {threshold} threshold. Run: python main.py reset --apply[/yellow]")
-    elif risk in {"HIGH", "VERY HIGH", "EMERGENCY"}:
-        lines.append("[yellow]Action: Run python main.py sync[/yellow]")
-    else:
-        lines.append("[green]You're fine. 9 PM sync handles the rest.[/green]")
+    next_steps = format_next_actions_panel()
+    if next_steps:
+        lines.extend(["", next_steps])
+    elif risk in {"LOW", "MODERATE"}:
+        lines.extend(["", "[green]No urgent actions. Daily sync handles rescue automatically.[/green]"])
 
     lines.extend([
         "",
         "[bold]Quick commands:[/bold]",
         '  find-notes.cmd  or  python main.py find "meeting notes"',
         '  ask.cmd           or  python main.py ask "what was I working on?"',
-        "  site.cmd          — public personal site (review before deploy)",
-        "  todos.cmd                               # refresh + open TODOs",
-        "  sync-now.cmd                            # rescue now (not only 9 PM)",
-        "  python main.py reset --apply            # fresh Notepad++ session",
-        "  python main.py inbox                    # open Inbox folder",
+        "  site.cmd          - public personal site (review before deploy)",
+        "  todos.cmd         - refresh + open TODOs (then todos.cmd apply)",
+        "  sync-now.cmd      - rescue now (not only 9 PM)",
+        "  reset-npp.cmd     - sync + fresh Notepad++ session",
+        "  workflows.cmd     - full quick-reference guide",
     ])
 
     console.print(Panel("\n".join(lines), title="note-rescue", border_style="cyan"))
 
     if getattr(args, "open_todos", False) and todo_path.exists():
         open_path(todo_path)
+
+
+def cmd_workflows(args):
+    """Show or open the one-page workflow quick reference."""
+    if not WORKFLOWS_PATH.exists():
+        console.print("[yellow]WORKFLOWS.md not found in project root.[/yellow]")
+        return
+
+    if getattr(args, "open", False):
+        open_path(WORKFLOWS_PATH, target="default")
+        console.print(f"[green]Opened[/green] {WORKFLOWS_PATH}")
+        return
+
+    summary = "\n".join([
+        "[bold]Daily[/bold]",
+        "  go.cmd           status + numbered next steps",
+        "  sync-now.cmd     rescue notes now",
+        "  find-notes.cmd   search and open a note",
+        "  ask.cmd          plain-English vault search",
+        "  reset-npp.cmd    sync + fresh Notepad++ session",
+        "",
+        "[bold]TODO cleanup (all 3 steps)[/bold]",
+        "  1. todos.cmd",
+        "  2. check off items in Notepad++, save",
+        "  3. todos.cmd apply",
+        "",
+        "[bold]Not sure which to run?[/bold]",
+        "  workflows.cmd    opens WORKFLOWS.md (full guide)",
+        "",
+        "[dim]Private: ask.cmd  |  Public: site.cmd (review before deploy)[/dim]",
+    ])
+    console.print(Panel(summary, title="Workflow quick reference", border_style="cyan"))
+    console.print(f"[dim]Full guide:[/dim] {WORKFLOWS_PATH}")
+    console.print("[dim]Open it: python main.py workflows --open[/dim]")
 
 
 def cmd_cleanup_report(args):
